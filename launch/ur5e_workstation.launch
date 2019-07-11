@@ -1,0 +1,33 @@
+<launch>
+
+
+  <!-- use argument ip:=<your.robot.ip.address> when lauching this file -->
+  <!-- on robot pendant, press top right menu button (three horizontal lines), click "About" and IP address will be displayed -->
+  <arg name="ip" />
+
+
+  <!-- Launch UR5e hardware bringup nodes and configuration parameters (**need universal_robot package for these files!!**) -->
+  <!-- ** https://github.com/ros-industrial/universal_robot ** -->
+  <!-- currently, joints should be limited -->
+  <include file="$(find ur5e_workstation)/launch/ur5e_bringup.launch">
+    <arg name="limited" value="true"/>
+    <arg name="robot_ip" value="$(arg ip)"/> 
+  </include>
+
+
+  <!-- Launch UR5e hardware planning execution and configuration parameters -->
+  <include file="$(find ur5e_joint_limited_robotiq_2f_85_moveit_config)/launch/ur5e_moveit_planning_execution.launch"/>
+
+
+  <!-- Launch Moveit! and Rviz files (rviz config file <your_configuration>.rviz can be chosen here) -->
+  <!-- Uses custom Moveit! package kinematics.yaml file for function -->
+  <include file="$(find ur5e_joint_limited_robotiq_2f_85_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+  </include>
+
+
+  <!-- Run node to place collision objects (the table + pedestal) from ur5e_workstation package (robot name is 'manipulator' as defined in custom Moveit! package: ur5e_joint_limited_robotiq_2f_85_moveit_config) -->
+  <node name="build_workstation" pkg="ur5e_workstation" type="build_workstation"/>
+
+
+</launch>

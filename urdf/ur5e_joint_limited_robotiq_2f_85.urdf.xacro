@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+       name="ur5e" >
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find ur_e_description)/urdf/common.gazebo.xacro" />
+
+  <!-- ur5e -->
+  <xacro:include filename="$(find ur_e_description)/urdf/ur5e.urdf.xacro" />
+
+  <!-- updated robotiq_2f_85 gripper -->
+  <xacro:include filename="$(find robotiq_2f_85_full)/urdf/robotiq_2f_85_full.urdf.xacro" />
+  
+  <!-- arm -->
+  <xacro:ur5e_robot prefix="" joint_limited="true"
+    shoulder_pan_lower_limit="${-pi}" shoulder_pan_upper_limit="${pi}"
+    shoulder_lift_lower_limit="${-pi}" shoulder_lift_upper_limit="${pi}"
+    elbow_joint_lower_limit="${-pi}" elbow_joint_upper_limit="${pi}"
+    wrist_1_lower_limit="${-2*pi}" wrist_1_upper_limit="${2*pi}"
+    wrist_2_lower_limit="${-2*pi}" wrist_2_upper_limit="${2*pi}"
+    wrist_3_lower_limit="${-2*pi}" wrist_3_upper_limit="${2*pi}"
+  />
+  
+  <!-- gripper -->
+  <xacro:robotiq_2f_85_full prefix=""/>
+
+  <joint name="robotiq_85_adapters_joint" type="fixed">
+    <parent link="tool0"/>
+    <child link="realsense_camera_mount_link"/>
+    <origin xyz="0.0235 -0.0535 0.0115" rpy="1.5707 0.0 -0.785" /> 
+  </joint>
+
+  <!-- world -->
+  <link name="world" />
+
+  <!-- world to robot joint -->
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link = "base_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+</robot>
