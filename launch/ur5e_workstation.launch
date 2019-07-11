@@ -5,6 +5,8 @@
   <!-- on robot pendant, press top right menu button (three horizontal lines), click "About" and IP address will be displayed -->
   <arg name="ip" />
 
+  <!-- Launch realsense camera mounted to wrist, filters exist and can be adjusted to get your favorite box dimensions depending on task requirements, feel free to add more filters or take some away within the referenced launch file -->
+  <include file="$(find ur5e_workstation)/launch/wrist_camera.launch"/>
 
   <!-- Launch UR5e hardware bringup nodes and configuration parameters (**need universal_robot package for these files!!**) -->
   <!-- ** https://github.com/ros-industrial/universal_robot ** -->

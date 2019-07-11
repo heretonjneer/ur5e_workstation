@@ -93,10 +93,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           ee_link:
             Alpha: 1
             Show Axes: false
@@ -238,10 +234,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           ee_link:
             Alpha: 1
             Show Axes: false
@@ -389,7 +381,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Flat Squares
-      Topic: /camera_back/depth_registered/points
+      Topic: /wrist_camera/depth_registered/points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -434,10 +426,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.114797309
+      Pitch: 0.104797333
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.02369714
+      Yaw: 3.12870193
     Saved: ~
 Window Geometry:
   Displays:
