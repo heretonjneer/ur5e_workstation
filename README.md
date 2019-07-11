@@ -53,3 +53,119 @@ git clone -b master https://github.com/flynn-nerve/robotiq_2f_85_full
 **This is for controlling the gripper, not modeling it**
 https://github.com/ros-industrial/robotiq
 git clone -b kinetic-devel https://github.com/ros-industrial/robotiq.git
+
+
+*********************************************************************************************************************************************
+**INSTRUCTIONS FOR INSTALLING REALSENSE CAMERAS**
+**** Realsense package installation instructions ****
+
+---- Setup ----
+Unplug any realsense cameras before completing installation
+
+cd <your_ws>/src
+
+---- Download librealsense github repo ----
+git clone -b  master https://github.com/IntelRealSense/librealsense.git
+
+---- Install core packages required to build librealsense binaries ----
+sudo apt-get install git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev
+
+sudo apt-get install libglfw3-dev
+
+---- Add server to list of repositories ----
+sudo apt-key adv --keyserver keys.gnupg.net --recv-key C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C8B3A55A6F3EFCDE
+
+sudo add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u
+
+---- Install libraries (and optional libraries) ----
+sudo apt-get install librealsense2-dkms librealsense2-utils librealsense2-dev librealsense2-dbg
+
+---- Update and upgrade ----
+sudo apt-get update && sudo apt-get upgrade
+
+---- Install dependencies and then build workspace ----
+rosdep install --from-paths src --ignore-src --rosdistro kinetic
+
+**** Realsense cameras will not work if you do not run these following scripts (from the <your_ws>/src/librealsense directory) and give the ports permissions (udev rule settings) ****
+cd librealsense
+
+./scripts/setup_udev_rules.sh
+
+./scripts/patch-realsense-ubuntu-lts.sh
+
+---- Download realsense package (not realsense-ros package) ----
+
+cd <your_ws>/src
+
+git clone -b development https://github.com/doronhi/realsense.git
+
+cd <your_ws>/src/realsense
+
+git clone -b kinetic-devel https://github.com/pal-robotics/ddynamic_reconfigure.git
+
+cd ../..
+
+---- Install dependencies and then build workspace ----
+rosdep install --from-paths src --ignore-src --rosdistro kinetic
+
+catkin build
+
+---- Test packages if build completed ----
+Plug in realsense camera
+
+roslaunch realsense2_camera rs_camera.launch
+
+rosrun rviz rviz
+
+in rviz; add topic for image view from camera to check that camera is working
+
+*********************************************************************************************************************************************
+**ONLY FOLLOW THESE INSTRUCTIONS IF SOMETHING IS BROKEN**
+
+---- If cameras will not work, check the libraries (librealsense-<stuff>, above) and if any say that they cannot be installed, follow these instructions:
+
+sudo apt-get remove librealsense2-dkms librealsense2-utils librealsense2-dev librealsense2-dbg
+
+dpkg -l | grep "realsense" | cut -d " " -f 3 | xargs sudo dpkg --purge
+
+sudo rm -f /etc/apt/sources.list.d/realsense-public.list
+
+sudo apt-get update
+
+sudo apt-get install librealsense2-dkms
+
+sudo apt-get install librealsense2-utils
+
+sudo apt-get install librealsense2-dev
+
+sudo apt-get install librealsense2-dbg
+
+**ONLY DO THESE INSTRUCTIONS IF THE PREVIOUS ONES DO NOT WORK AND IT IS VERY BROKEN**
+**** If this still does not work, you have to delete more and may have messed something up but it is fixable ****
+**** Fair warning, this will make ros basically not work, it is not permanent, this is what I did when I broke everything ****
+
+manually delete the librealsense and realsense packages
+
+sudo apt-get remove librealsense2-dkms librealsense2-utils librealsense2-dev librealsense2-dbg
+
+dpkg -l | grep "realsense" | cut -d " " -f 3 | xargs sudo dpkg --purge
+
+sudo rm -f /etc/apt/sources.list.d/realsense-public.list
+
+sudo apt-get remove --install-recommends linux-generic-lts-xenial xserver-xorg-core-lts-xenial xserver-xorg-lts-xenial xserver-xorg-video-all-lts-xenial xserver-xorg-input-all-lts-xenial libwayland-egl1-mesa-lts-xenial
+
+sudo apt-get remove git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev
+
+sudo apt-get update && sudo apt-get upgrade
+
+cd <your_ws>
+
+rosdep install --from-paths src --ignore-src --rosdistro kinetic
+
+catkin build
+
+source ./devel/setup.bash
+
+**** This should fix everything, you may find that a couple of packages you had installed from binaries are not working, just reinstall them and you should be good to go. at this point, go back to the start and redo the process. If everything is done correctly, you won't run into this issue ****
+
+
