@@ -10,6 +10,15 @@ updated contents include launch files for using realsense cameras instead of kin
 
 roslaunch ur5e_workstation ur5e_workstation.launch ip:=<ip.address.of.robot>
 
+** to run the robot as a simulation:
+
+roslaunch ur5e_workstation ur5e_workstation.launch sim:=true
+
+** to run the manipulation node which will capture 4 "snapshots" with the realsense camera, filter and concatenate the image:
+
+(in a separate terminal)
+rosrun ur5e_workstation manipulation_node
+
 **To control the actual robot, press the power button on the top of the front of the ur5e pendant. Once the pendant has booted up, click the red button in the bottom left and presst ON to activate the robot and START to enable movement, then close the initialize window by clicking Exit in th ebottom left. in the top right is an icon that looks like the pendant, click this icon and select Remote Control, the only option. In the very top right is a menu button represented by three horizontal lines, click this and then click About. A window will pop up showing the robot's IP address, use this as the argument for launching the above launch file to get the robot going**
 ** If you need to manually move the robot around to reset a position or experiment with some joint configurations, simply navigate back to the top right of the pendant where you previously clicked on the image of the pendant to set Remote control. There is now an icon that represents remote controll in its place, click this and select Local control to regain control over the robot from the pendant ** 
 
