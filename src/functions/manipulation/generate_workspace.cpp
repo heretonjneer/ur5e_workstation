@@ -1,24 +1,22 @@
-/* Author: Brian Flynn*/
+// ********************************************************************************************
+// Author: Brian Flynn;
+// Test Engineer - NERVE Center @ UMASS Lowell
+// generate_workspace.cpp
+//
+// manipulation_class function
+// ********************************************************************************************
 
-// ROS
-#include <ros/ros.h>
+#include "manipulation_class.hpp"
 
-// MoveIt!
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <moveit/move_group_interface/move_group_interface.h>
-
-// TF2
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
-void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface) {
+void Manipulation::generate_workspace() {
 
   // Create a vector to hold collision objects.
   std::vector<moveit_msgs::CollisionObject> collision_objects;
-  collision_objects.resize(2);
+  collision_objects.resize(3);
 
   // Add workstation surface
   // ************************************************************************************************ 
-  // 0.192 (robot center from edge of table)
+  // 0.192 (distance from robot center to edge of workstation)
   collision_objects[0].id = "workstation";
   collision_objects[0].header.frame_id = "world";
 
@@ -33,10 +31,6 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[0].primitive_poses[0].position.x = -0.642;
   collision_objects[0].primitive_poses[0].position.y = 0;
   collision_objects[0].primitive_poses[0].position.z = -0.1345;
-
-  // Add and apply collision object(s) to scene
-  collision_objects[0].operation = collision_objects[0].ADD;
-  planning_scene_interface.applyCollisionObjects(collision_objects);
   // ************************************************************************************************
 
 
@@ -57,33 +51,31 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[1].primitive_poses[0].position.x = 0.0;
   collision_objects[1].primitive_poses[0].position.y = 0.0;
   collision_objects[1].primitive_poses[0].position.z = -0.125;
-
-  // Add and apply collision object(s) to scene
-  collision_objects[1].operation = collision_objects[1].ADD;
-  planning_scene_interface.applyCollisionObjects(collision_objects);
   // ************************************************************************************************
 
-}
+  // Add dropoff box
+  // ************************************************************************************************
+  // min line with table surface
+  collision_objects[2].id = "dropoffbox";
+  collision_objects[2].header.frame_id = "world";
 
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "insert_workstation_objects");
-  ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(1);
-  spinner.start();
+  // Define primitives, dimensions and position
+  collision_objects[2].primitives.resize(1);
+  collision_objects[2].primitives[0].type = collision_objects[2].primitives[0].BOX;
+  collision_objects[2].primitives[0].dimensions.resize(3);
+  collision_objects[2].primitives[0].dimensions[0] = 0.33;
+  collision_objects[2].primitives[0].dimensions[1] = 0.13;
+  collision_objects[2].primitives[0].dimensions[2] = 0.14;
+  collision_objects[2].primitive_poses.resize(1);
+  collision_objects[2].primitive_poses[0].position.x = -0.255;
+  collision_objects[2].primitive_poses[0].position.y = -0.765;
+  collision_objects[2].primitive_poses[0].position.z = -0.0795;
+  // ************************************************************************************************
 
-  // Set up planning scene/group (robot_name)
-  ros::WallDuration(1.0).sleep();
-  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-  moveit::planning_interface::MoveGroupInterface group("manipulator");
-  group.setPlanningTime(45.0);
+  // Add and apply collision object(s) to scene
+  collision_objects[0].operation = collision_objects[0].ADD;
+  collision_objects[1].operation = collision_objects[1].ADD;
+  collision_objects[2].operation = collision_objects[2].ADD;
+  this->planning_scene_ptr->applyCollisionObjects(collision_objects);
 
-  // Add object(s) to planning scene
-  addCollisionObjects(planning_scene_interface);
-
-  // Wait for objects to initialize
-  ros::WallDuration(1.0).sleep();
-
-  ros::waitForShutdown();
-  return 0;
 }

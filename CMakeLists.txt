@@ -29,16 +29,23 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_eigen
   tf2_geometry_msgs
+  robotiq_2f_gripper_control
 )
 
 catkin_package(
 )
 
-include_directories(
+include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(build_workstation src/build_workstation.cpp)
-target_link_libraries(build_workstation ${catkin_LIBRARIES})
+add_executable(manipulation_node
+	src/nodes/manipulation_node.cpp 
+	src/functions/manipulation/move_to_.cpp
+        src/functions/manipulation/generate_workspace.cpp
+	src/functions/perception/perception_class.cpp
+        src/functions/perception/concatenate_cloud.cpp
+	src/functions/perception/take_snapshot_.cpp)
+target_link_libraries(manipulation_node ${catkin_LIBRARIES})
 
 

@@ -61,6 +61,7 @@
   <build_depend>moveit_visual_tools</build_depend>
   <build_depend>moveit_ros_planning_interface</build_depend>
   <build_depend>interactive_markers</build_depend>
+  <build_depend>robotiq_2f_gripper_control</build_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>pcl_conversions</build_export_depend>
   <build_export_depend>pcl_ros</build_export_depend>
@@ -85,6 +86,7 @@
   <exec_depend>moveit_visual_tools</exec_depend>
   <exec_depend>moveit_ros_planning_interface</exec_depend>
   <exec_depend>interactive_markers</exec_depend>
+  <exec_depend>robotiq_2f_gripper_control</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

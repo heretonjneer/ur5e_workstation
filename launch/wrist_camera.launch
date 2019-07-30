@@ -9,62 +9,50 @@ on the rigging so that its pointcloud can be visualized
 
 <launch>
 
-    <!-- This launches the camera with the correct parameters -->
-    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
-	<arg name="camera" value="wrist_camera" />
-	<!-- <arg name="serial_no" value="843112074077" />  -->
-    </include>
+  <!-- This launches the camera with the correct parameters -->
+  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
+    <arg name="camera" value="wrist_camera" />
+    <!-- <arg name="serial_no" value="843112074077" />  -->
+  </include>
 
+  <group ns="/pcl_filters">
+    <!-- PCL Manager -->
+    <node pkg="nodelet" type="nodelet" name="box_filter_pcl_manager" args="manager" output="screen"/>
 
-    <!-- These nodelets limit the FOV of the camera to 0.635 meters in depth -->
-    <!-- These nodelets limit the FOV of the camera to (+/-)0.3175 meters to the sides  -->
-    <!-- These nodelets filter out the ground plane which is approx. 0.085 meters below the camera-->
-    <node pkg="nodelet" type="nodelet" name="cloud_back_filter_fov_depth" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input"  to="/wrist_camera/depth_registered/points"/>
-        <remap from="~output" to="/wrist_camera/depth_registered/points_filtered_depth"/>
-        <rosparam>
-            filter_field_name: z
-            filter_limit_min: 0.0
-            filter_limit_max: 0.60
-            filter_limit_negative: False
-        </rosparam>
-    </node>	
-    <node pkg="nodelet" type="nodelet" name="cloud_back_filter_fov_sides" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input"  to="/wrist_camera/depth_registered/points_filtered_depth"/>
-        <remap from="~output" to="/wrist_camera/depth_registered/points_filtered_sides"/>
-        <rosparam>
-            filter_field_name: x
-            filter_limit_min: -0.28
-            filter_limit_max:  0.28
-            filter_limit_negative: False
-        </rosparam>
-    </node>	
+    <!-- Run a passthrough filter to delimit in x direction -->
+    <node pkg="nodelet" type="nodelet" name="wrist_camera_x_filter" args="load pcl/PassThrough box_filter_pcl_manager" output="screen">
+      <remap from="~input" to="/wrist_camera/depth_registered/points" />
+      <rosparam>
+        filter_field_name: x
+        filter_limit_min: -1.0
+        filter_limit_max: 1.0
+      </rosparam>
+    </node>
 
+    <!-- Run a passthrough filter to delimit in y direction -->
+    <node pkg="nodelet" type="nodelet" name="wrist_camera_xy_filter" args="load pcl/PassThrough box_filter_pcl_manager" output="screen">
+      <remap from="~input" to="wrist_camera_x_filter/output" />
+      <rosparam>
+        filter_field_name: y
+        filter_limit_min: -1.0
+        filter_limit_max: 1.0
+      </rosparam>
+    </node>
 
-    <node pkg="nodelet" type="nodelet" name="cloud_back_ground_filter" args="load pcl/PassThrough pcl_manager" output="screen">
-        <remap from="~input"  to="/wrist_camera/depth_registered/points_filtered_sides"/>
-        <remap from="~output" to="/wrist_camera/depth_registered/points_filtered_ground_plane"/>
-        <rosparam>
-            filter_field_name: y
-            filter_limit_min: -1.0
-            filter_limit_max: 0.082
-            filter_limit_negative: False
-        </rosparam>
-    </node>	
-    <node pkg="nodelet" type="nodelet" name="cloud_back_outlier_removal" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen"> 
-        <remap from="~input"  to="/wrist_camera/depth_registered/points_filtered_ground_plane" /> 
-        <remap from="~output" to="/wrist_camera/depth_registered/points_filtered" /> 
-        <rosparam> 
-               mean_k: 100 
-               stddev: 0.1 
-               negative: False 
-        </rosparam> 
-    </node> 
+    <!-- Run a passthrough filter to delimit in z direction -->
+    <node pkg="nodelet" type="nodelet" name="wrist_camera_xyz_filter" args="load pcl/PassThrough box_filter_pcl_manager" output="screen">
+      <remap from="~input" to="wrist_camera_xy_filter/output" />
+      <rosparam>
+        filter_field_name: z
+        filter_limit_min: -0.25
+        filter_limit_max: 0.5
+      </rosparam>
+    </node>
+  </group>
 
-
-    <!-- This transforms each resulting pointcloud into a global reference frame -->
-    <node name="wrist_camera_tf" pkg="tf" type="static_transform_publisher"
-        args="0.0 0.034 0.0 0.0075 0 -1.5707 /realsense_camera_link /wrist_camera_color_optical_frame 100"/>
+  <!-- This transforms each resulting pointcloud into a global reference frame -->
+  <node name="wrist_camera_tf" pkg="tf" type="static_transform_publisher"
+    args="-0.0325 0.025 0.0 0.0075 0 -1.5707 /realsense_camera_link /wrist_camera_color_optical_frame 100"/>
 
 </launch>
 
